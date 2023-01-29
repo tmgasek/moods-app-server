@@ -15,17 +15,17 @@ const register = async ({ username, password }: RegisterArgs) => {
   const hash = await hashPassword(password);
   // this doesn't return correct types, either cast as any or
   // https://stackoverflow.com/questions/62155984/node-mysql2-cant-access-update-results
-  const rows: any = await db.query(
+  const res: any = await db.query(
     "INSERT INTO `users` (username, password) VALUES (?, ?)",
     [username, hash]
   );
 
-  if (!rows.affectedRows) {
+  if (!res.affectedRows) {
     throw new Error("Error registering user");
   }
 
-  console.log("REGISTER ROWS", rows);
-  const userId = rows.insertId;
+  console.log("REGISTER ROWS", res);
+  const userId = res.insertId;
 
   // TODO: interesting method handling
   // let message = 'Error in deleting programming language';

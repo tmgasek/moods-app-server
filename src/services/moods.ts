@@ -20,13 +20,14 @@ interface GetOneArgs {
 
 interface CreateArgs {
   userId: number;
-  mood: Mood;
+  value: string;
+  context?: string;
 }
 
 interface UpdateArgs {
   id: number;
   userId: number;
-  mood: Mood;
+  context: string;
 }
 
 interface RemoveArgs {
@@ -42,30 +43,68 @@ const getAll = async ({ userId }: GetAllArgs) => {
     `,
     [userId]
   );
+
   return moods;
 };
 
 const getOne = async ({ id, userId }: GetOneArgs) => {
-  // TODO
   const mood = await db.query(
     `
     SELECT * FROM moods WHERE id = ? AND user_id = ?
     `,
     [id, userId]
   );
+
   return mood;
 };
 
-const create = async ({ userId, mood }: CreateArgs) => {
-  // TODO
+const create = async ({ userId, value, context }: CreateArgs) => {
+  const res: any = await db.query(
+    `
+    INSERT INTO moods (value, context, user_id) VALUES (?, ?, ?)
+    `,
+    [value, context, userId]
+  );
+
+  if (!res.affectedRows) {
+    throw new Error("Could not create mood");
+  }
+
+  return res.insertId;
 };
 
-const update = async ({ id, userId, mood }: UpdateArgs) => {
-  // TODO
+const update = async ({ id, userId, context }: UpdateArgs) => {
+  const res: any = await db.query(
+    `
+    UPDATE moods SET context = ? WHERE id = ? AND user_id = ?
+    `,
+    [context, id, userId]
+  );
+
+  console.log("UPDATE RES", res);
+
+  if (!res.affectedRows) {
+    throw new Error("Could not update mood");
+  }
+
+  return id;
 };
 
 const remove = async ({ id, userId }: RemoveArgs) => {
-  // TODO
+  const res: any = await db.query(
+    `
+    DELETE FROM moods WHERE id = ? AND user_id = ?
+    `,
+    [id, userId]
+  );
+
+  console.log("DELETE RES", res);
+
+  if (!res.affectedRows) {
+    throw new Error("Could not remove mood");
+  }
+
+  return id;
 };
 
 const moodsService = {
