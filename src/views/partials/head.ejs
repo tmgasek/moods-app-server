@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/styles/style.css" rel="stylesheet" type="text/css" />
+  <title>Moods | <%= title %>
+  </title>
+</head>
+
+<body class="layout">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <!-- if user exists, don't show register or login -->
+      <% if (user) { %>
+        <li><a href="/auth/logout">Logout</a></li>
+        <li>Welcome, <%=user%>
+        </li>
+        <% } else { %>
+          <li><a href="/auth/register">Register</a></li>
+          <li><a href="/auth/login">Login</a></li>
+          <% } %>
+
+    </ul>
+  </nav>

@@ -1,0 +1,21 @@
+<%- include('partials/head.ejs') %>
+
+  <body>
+    <h1>
+      <%= title %>
+    </h1>
+
+    <div>
+      hello this is some sample context
+    </div>
+  </body>
+
+
+  <script>
+    const title = '<%= title %>';
+    const string = "qweqeeqwwq"
+    console.log(title, string);
+
+  </script>
+
+  <%- include('partials/footer.ejs') %>

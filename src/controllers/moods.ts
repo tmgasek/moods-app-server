@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import moodsService from "../services/moods";
 
 // TODO: req.session.userId is not defined but it should be as path is protected
+// https://stackoverflow.com/questions/66614337/typescript-req-user-is-possibly-undefined-express-and-passport-js
 
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.session;

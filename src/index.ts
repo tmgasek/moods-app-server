@@ -1,4 +1,5 @@
 import config from "./config";
+import path from "path";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
@@ -14,6 +15,7 @@ declare module "express-session" {
 
 const app = express();
 
+// middleware
 app.use(
   session({
     name: config.SESSION_NAME,
@@ -27,7 +29,6 @@ app.use(
     },
   })
 );
-
 app.use(
   cors({
     origin: config.FRONTEND_URL,
@@ -35,14 +36,24 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
-
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ejs setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+// static files
+app.use(express.static(path.join(__dirname, "../public")));
+
+// routes
 app.use("/auth", authRouter);
 app.use("/api/user", protect, userRouter);
 app.use("/api/moods", protect, moodsRouter);
+
+app.use("/", (req, res, next) => {
+  res.render("index", { title: "Express", user: req.session.userId });
+});
 
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}!`);

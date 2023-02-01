@@ -3,10 +3,14 @@ import authController from "../controllers/auth";
 
 const router = Router();
 
+router.get("/login", authController.pageLogin);
+
 router.post("/login", authController.login);
+
+router.get("/register", authController.pageRegister);
 
 router.post("/register", authController.register);
 
-router.post("/logout", authController.logout);
+router.get("/logout", authController.logout);
 
 export default router;
