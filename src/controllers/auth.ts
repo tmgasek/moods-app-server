@@ -32,8 +32,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = await authService.login({ username, password });
     req.session.userId = userId;
-    // res.json({ message: "Success" });
-    res.redirect("/");
+    res.redirect("/moods");
   } catch (e) {
     console.error("Error logging in user: ", e);
     next(e);
@@ -47,7 +46,6 @@ const logout = (req: Request, res: Response) => {
       return res.redirect("/");
     }
     res.clearCookie(config.SESSION_NAME);
-    // res.redirect("/login");
     res.redirect("/");
   });
 };

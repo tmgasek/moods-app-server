@@ -1,20 +1,60 @@
 <%- include('partials/head.ejs') %>
 
-  <body>
+  <main>
+
     <h1>
       <%= title %>
     </h1>
-
     <div>
-      hello this is some sample context
+      <div>
+        <% if (moods.length> 0) { %>
+          <% moods.forEach(mood=>{ %>
+            <div class="mood">
+              <p>
+                <span>
+                  <%= mood.value %>
+                </span>
+                <span>
+                  <%= mood.created_at %>
+                </span>
+                <span>id: <%= mood.id %> </span>
+                <button class="delete" data-mood-id="<%= mood.id %>">Delete</button>
+                <a class="view" href="/moods/<%= mood.id%>">View</a>
+            </div>
+            </p>
+            <% }) %>
+              <% } else { %>
+                <p>no moods</p>
+                <% } %>
+
+      </div>
     </div>
-  </body>
 
-
+  </main>
   <script>
-    const title = '<%= title %>';
-    const string = "qweqeeqwwq"
-    console.log(title, string);
+
+    // add event listener to each delete button that will delete the mood from the database
+    const deleteButtons = document.querySelectorAll('.delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const moodId = e.target.dataset.moodId;
+        const response = await fetch(`/moods/${moodId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          // remove the mood from the page
+          e.target.parentElement.remove();
+        } else {
+          console.log(response)
+          alert(response.statusText);
+        }
+      });
+    });
+
+
 
   </script>
 

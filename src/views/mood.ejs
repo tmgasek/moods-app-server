@@ -1,0 +1,76 @@
+<%- include('partials/head.ejs') %>
+  <main>
+    <h1>
+      <%= title %>
+    </h1>
+    <p id="value-view">
+      <%= mood.value %>
+    </p>
+    <div class="view-mode">
+
+      <p id="context-view">
+        <%= mood.context %>
+      </p>
+    </div>
+    <div class="hidden edit-mode">
+      <label for="context">Context</label>
+      <input type="text" name="context" id="context-edit" value="<%= mood.context %>">
+
+      <button class="cancel">Cancel</button>
+      <button class="save" data-mood-id="<%= mood.id %>">Save</button>
+    </div>
+
+    <button class="edit">Edit</button>
+    <button class="delete" data-mood-id="<%= mood.id %>">Delete</button>
+  </main>
+  <%- include('partials/footer') %>
+
+    <script>
+      const editButton = document.querySelector('.edit');
+      const cancelButton = document.querySelector('.cancel');
+      const editWrapper = document.querySelector('.edit-mode');
+      const viewWrapper = document.querySelector('.view-mode');
+      const saveButton = document.querySelector('.save');
+
+      const toggleEditState = () => {
+        [editWrapper, viewWrapper, editButton].forEach(el => el.classList.toggle('hidden'));
+      }
+
+      [editButton, cancelButton].forEach(button => {
+        button.addEventListener('click', (e) => {
+          toggleEditState();
+        });
+      })
+
+
+      // when the save button is clicked, save the changes to the database
+      saveButton.addEventListener('click', async (e) => {
+        const moodId = e.target.dataset.moodId;
+        const context = document.querySelector('#context-edit').value;
+
+        try {
+          const response = await fetch(`/moods/${moodId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              context
+            })
+          })
+
+          toggleEditState();
+          console.log(response)
+
+          if (response.ok) {
+            document.querySelector('#context-view').innerText = context;
+          } else {
+            alert(response.statusText);
+          }
+
+        } catch (e) {
+          alert(e.message)
+        }
+      })
+
+    </script>

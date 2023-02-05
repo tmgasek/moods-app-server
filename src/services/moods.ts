@@ -55,6 +55,8 @@ const getOne = async ({ id, userId }: GetOneArgs) => {
     [id, userId]
   );
 
+  console.log("MOOD", mood);
+
   return mood;
 };
 

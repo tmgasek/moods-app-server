@@ -27,15 +27,6 @@ const register = async ({ username, password }: RegisterArgs) => {
   console.log("REGISTER ROWS", res);
   const userId = res.insertId;
 
-  // TODO: interesting method handling
-  // let message = 'Error in deleting programming language';
-  //
-  // if (result.affectedRows) {
-  //   message = 'Programming language deleted successfully';
-  // }
-  //
-  // return {message};
-
   return userId;
 };
 

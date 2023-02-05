@@ -48,12 +48,17 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 // routes
 app.use("/auth", authRouter);
-app.use("/api/user", protect, userRouter);
-app.use("/api/moods", protect, moodsRouter);
-
+app.use("/user", protect, userRouter);
+app.use("/moods", protect, moodsRouter);
 app.use("/", (req, res, next) => {
-  res.render("index", { title: "Express", user: req.session.userId });
+  const { userId } = req.session;
+
+  res.render("home", { title: "Express", user: userId });
 });
+
+// app.use("/", (req, res, next) => {
+//   res.render("index", { title: "Express", user: req.session.userId });
+// });
 
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}!`);

@@ -5,11 +5,13 @@ import moodsService from "../services/moods";
 // https://stackoverflow.com/questions/66614337/typescript-req-user-is-possibly-undefined-express-and-passport-js
 
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
+  console.log("getting all moods");
   const { userId } = req.session;
-
   try {
     const moods = await moodsService.getAll({ userId });
-    res.json(moods);
+    res.render("index", { moods, title: "Moods", user: userId });
+
+    // res.json(moods);
   } catch (e) {
     console.error("Error getting all moods: ", e);
     next(e);
@@ -20,13 +22,23 @@ const getOne = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { userId } = req.session;
 
+  console.log("Do i run??");
+
   try {
     const mood = await moodsService.getOne({ id, userId });
-    res.json(mood);
+    if (!mood.length) {
+      return res.status(404).json({ message: "Mood not found" });
+    }
+    res.render("mood", { mood: mood[0], title: "Mood", user: userId });
   } catch (e) {
     console.error("Error getting one mood: ", e);
     next(e);
   }
+};
+
+const createPage = async (req: Request, res: Response) => {
+  const { userId } = req.session;
+  res.render("create", { title: "Create mood", user: userId });
 };
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +47,7 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const mood = await moodsService.create({ value, context, userId });
-    res.json(mood);
+    res.redirect("/moods");
   } catch (e) {
     console.error("Error creating mood: ", e);
     next(e);
@@ -46,6 +58,8 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { userId } = req.session;
   const { context } = req.body;
+
+  console.log("UPDATING XDDDD");
 
   try {
     const moodId = await moodsService.update({ id, context, userId });
@@ -60,6 +74,8 @@ const remove = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { userId } = req.session;
 
+  console.log("REMOVINGG XDDDD");
+
   try {
     const moodId = await moodsService.remove({ id, userId });
     res.json(moodId);
@@ -73,6 +89,7 @@ const moodsController = {
   getAll,
   getOne,
   create,
+  createPage,
   update,
   remove,
 };
