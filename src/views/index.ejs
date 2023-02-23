@@ -5,38 +5,46 @@
     <h1>
       <%= title %>
     </h1>
-    <div>
-      <div>
-        <% if (moods.length> 0) { %>
-          <% moods.forEach(mood=>{ %>
-            <div class="mood">
-              <p>
-                <span>
-                  <%= mood.value %>
-                </span>
-                <span>
-                  <%= mood.created_at %>
-                </span>
-                <span>id: <%= mood.id %> </span>
-                <button class="delete" data-mood-id="<%= mood.id %>">Delete</button>
-                <a class="view" href="/moods/<%= mood.id%>">View</a>
+    <div class="mood-list-wrapper">
+      <% if (moods.length> 0) { %>
+        <% moods.forEach(mood=>{ %>
+          <div class="mood">
+            <div class="mood-info">
+              <span class="debug">id: <%= mood.id %> </span>
+              <h3 class="mood-value">
+                <%= mood.value %>
+              </h3>
+              <p class="mood-context">
+                <%= mood.context %>
+              </p>
+              <span class="mood-date">
+                <%= mood.created_at %>
+              </span>
             </div>
-            </p>
-            <% }) %>
-              <% } else { %>
-                <p>no moods</p>
-                <% } %>
 
-      </div>
+            <div class="mood-actions">
+              <a class="mood-view" href="/moods/<%= mood.id%>">View</a>
+              <button class="mood-delete" data-mood-id="<%= mood.id %>">Delete</button>
+            </div>
+          </div>
+          <% }) %>
+            <% } else { %>
+              <p>no moods</p>
+              <% } %>
+
     </div>
 
   </main>
   <script>
 
     // add event listener to each delete button that will delete the mood from the database
-    const deleteButtons = document.querySelectorAll('.delete');
+    const deleteButtons = document.querySelectorAll('.mood-delete');
     deleteButtons.forEach(button => {
       button.addEventListener('click', async (e) => {
+        // alert to confirm the user wants to delete the mood
+        const confirmDelete = confirm('Are you sure you want to delete this mood?');
+        if (!confirmDelete) return;
+
         const moodId = e.target.dataset.moodId;
         const response = await fetch(`/moods/${moodId}`, {
           method: 'DELETE',
@@ -46,7 +54,7 @@
         });
         if (response.ok) {
           // remove the mood from the page
-          e.target.parentElement.remove();
+          e.target.closest('.mood').remove();
         } else {
           console.log(response)
           alert(response.statusText);

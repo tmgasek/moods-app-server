@@ -4,6 +4,7 @@ import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 import cors from "cors";
+import helmet from "helmet";
 import { authRouter, userRouter, moodsRouter } from "./routes";
 import { protect } from "./middleware";
 
@@ -16,6 +17,7 @@ declare module "express-session" {
 const app = express();
 
 // middleware
+// app.use(helmet());
 app.use(
   session({
     name: config.SESSION_NAME,
@@ -55,10 +57,6 @@ app.use("/", (req, res, next) => {
 
   res.render("home", { title: "Express", user: userId });
 });
-
-// app.use("/", (req, res, next) => {
-//   res.render("index", { title: "Express", user: req.session.userId });
-// });
 
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}!`);

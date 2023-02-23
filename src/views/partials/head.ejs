@@ -14,7 +14,7 @@
     <ul>
       <li><a href="/">Home</a></li>
       <!-- if user exists, don't show register or login -->
-      <% if (user) { %>
+      <% if (typeof user !=="undefined" ) { %>
         <li><a href="/moods">Moods</a></li>
         <li><a href="/moods/create">Log a mood</a></li>
         <li><a href="/auth/logout">Logout</a></li>

@@ -12,6 +12,7 @@ router.get("/me", (req, res) => {
     });
     return;
   }
+
   res.json({
     message: "You are not logged in",
   });

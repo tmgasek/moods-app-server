@@ -16,12 +16,13 @@
       <label for="context">Context</label>
       <input type="text" name="context" id="context-edit" value="<%= mood.context %>">
 
-      <button class="cancel">Cancel</button>
       <button class="save" data-mood-id="<%= mood.id %>">Save</button>
+      <button class="cancel">Cancel</button>
     </div>
 
     <button class="edit">Edit</button>
     <button class="delete" data-mood-id="<%= mood.id %>">Delete</button>
+    <%- include('partials/error.ejs') %>
   </main>
   <%- include('partials/footer') %>
 
@@ -31,6 +32,7 @@
       const editWrapper = document.querySelector('.edit-mode');
       const viewWrapper = document.querySelector('.view-mode');
       const saveButton = document.querySelector('.save');
+      const deleteButton = document.querySelector('.delete');
 
       const toggleEditState = () => {
         [editWrapper, viewWrapper, editButton].forEach(el => el.classList.toggle('hidden'));
@@ -42,11 +44,17 @@
         });
       })
 
+      // prevent the context from submitting if it's over 255 characters
+      document.querySelector('#context-edit').addEventListener('input', (e) => {
+        if (e.target.value.length > 255) {
+          e.target.value = e.target.value.slice(0, 255);
+        }
+      })
 
       // when the save button is clicked, save the changes to the database
       saveButton.addEventListener('click', async (e) => {
-        const moodId = e.target.dataset.moodId;
         const context = document.querySelector('#context-edit').value;
+        const moodId = e.target.dataset.moodId;
 
         try {
           const response = await fetch(`/moods/${moodId}`, {
@@ -59,16 +67,44 @@
             })
           })
 
-          toggleEditState();
-          console.log(response)
-
-          if (response.ok) {
-            document.querySelector('#context-view').innerText = context;
-          } else {
-            alert(response.statusText);
+          if (!response.ok) {
+            const errRes = await response.json()
+            console.error(errRes)
+            alert(errRes.message);
+            return;
           }
 
+          document.querySelector('#context-view').innerText = context;
+          toggleEditState();
+
         } catch (e) {
+          console.error(e)
+          alert(e.message)
+        }
+      })
+
+      // when the delete button is clicked, delete the mood from the database
+      deleteButton.addEventListener('click', async (e) => {
+        const moodId = e.target.dataset.moodId;
+
+        try {
+          const response = await fetch(`/moods/${moodId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+
+          if (!response.ok) {
+            const errRes = await response.json()
+            console.error(errRes)
+            alert(errRes.message);
+          }
+
+          window.location.href = '/moods';
+
+        } catch (e) {
+          console.error(e)
           alert(e.message)
         }
       })
