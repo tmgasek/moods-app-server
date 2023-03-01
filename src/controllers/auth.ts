@@ -8,17 +8,14 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(422).render("register", {
-      title: "Register",
-      errors: errors.array(),
-    });
+    res.status(400).json({ errors: errors.array() });
     return;
   }
 
   try {
     const userId = await authService.register({ username, password });
     req.session.userId = userId;
-    res.status(201).redirect("/moods");
+    res.status(200).json({ userId });
   } catch (e: any) {
     console.error("Error registering user: ", e);
     const customErrors = [];
@@ -31,10 +28,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         customErrors.push({ msg: "Error registering user:" + e });
     }
 
-    res.status(403).render("register", {
-      title: "Register",
-      errors: customErrors,
-    });
+    res.status(400).json({ errors: customErrors });
 
     next(e);
   }
@@ -45,17 +39,15 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(422).render("login", {
-      title: "Login",
-      errors: errors.array(),
-    });
+    res.status(400).json({ errors: errors.array() });
     return;
   }
 
   try {
     const userId = await authService.login({ username, password });
     req.session.userId = userId;
-    res.status(200).redirect("/moods");
+    console.log("req.session", req.session);
+    res.status(200).json({ userId });
   } catch (e: any) {
     const customErrors = [];
 
@@ -66,10 +58,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       default:
         customErrors.push({ msg: "Something went wrong! " + e });
     }
-    res.status(401).render("login", {
-      title: "Login",
-      errors: customErrors,
-    });
+
+    res.status(400).json({ errors: customErrors });
 
     next(e);
   }

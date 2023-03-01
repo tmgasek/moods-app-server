@@ -1,12 +1,10 @@
 import { Router } from "express";
-import moodsController from "../controllers/moods";
+import moodsController from "../../controllers/moods";
 import { body, param, validationResult } from "express-validator";
 
 const router = Router();
 
 router.get("/", moodsController.getAll);
-
-router.get("/create", moodsController.createPage);
 
 router.post(
   "/",
