@@ -24,7 +24,6 @@ const register = async ({ username, password }: RegisterArgs) => {
     throw new Error("Error registering user");
   }
 
-  console.log("REGISTER ROWS", res);
   const userId = res.insertId;
 
   return userId;

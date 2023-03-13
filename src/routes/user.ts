@@ -3,7 +3,6 @@ import Router from "express";
 const router = Router();
 
 router.get("/me", (req, res) => {
-  console.log(req.session);
   const userId = req.session.userId;
   if (userId) {
     res.json({

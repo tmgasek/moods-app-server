@@ -5,7 +5,7 @@ import session from "express-session";
 import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
-import { authRouter, userRouter, moodsRouter } from "./routes";
+import { authRouter, userRouter, moodsRouter, contextRouter } from "./routes";
 import { protect } from "./middleware";
 import fetch from "node-fetch";
 
@@ -54,41 +54,17 @@ app.use(express.urlencoded({ extended: true }));
 // });
 
 // ejs setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+// app.set("views", path.join(__dirname, "views"));
+// app.set("view engine", "ejs");
 // static files
-app.use(express.static(path.join(__dirname, "../public")));
+// app.use(express.static(path.join(__dirname, "../public")));
 
 // routes
 app.use("/auth", authRouter);
 app.use("/user", protect, userRouter);
 // app.use("/moods", protect, moodsRouter);
 app.use("/api/moods", protect, moodsRouter);
-
-app.get("/moods", protect, async (req, res) => {
-  const opts = {
-    headers: {
-      cookie: req.headers.cookie as string,
-    },
-  };
-  // get all the moods from the api
-  const response = await fetch("http://localhost:3001/api/moods", opts);
-  const data = await response.json();
-
-  console.log(data);
-
-  res.render("index", {
-    title: "Moods",
-    moods: data,
-    user: req.session.userId,
-  });
-});
-
-app.use("/", (req, res, next) => {
-  const { userId } = req.session;
-
-  res.render("home", { title: "Express", user: userId });
-});
+app.use("/api/contexts", protect, contextRouter);
 
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}!`);

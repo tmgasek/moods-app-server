@@ -46,7 +46,6 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = await authService.login({ username, password });
     req.session.userId = userId;
-    console.log("req.session", req.session);
     res.status(200).json({ userId });
   } catch (e: any) {
     const customErrors = [];
@@ -72,18 +71,7 @@ const logout = (req: Request, res: Response) => {
       return res.status(400).redirect("/");
     }
     res.clearCookie(config.SESSION_NAME);
-    res.status(200).redirect("/");
-  });
-};
-
-const pageLogin = (req: Request, res: Response) => {
-  res.render("login", { title: "Login", user: req.session.userId });
-};
-
-const pageRegister = (req: Request, res: Response) => {
-  res.render("register", {
-    title: "Register",
-    user: req.session.userId,
+    res.status(200).json({ msg: "Logged out" });
   });
 };
 
@@ -91,8 +79,6 @@ const authController = {
   register,
   login,
   logout,
-  pageLogin,
-  pageRegister,
 };
 
 export default authController;

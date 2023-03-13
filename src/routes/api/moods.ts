@@ -8,24 +8,25 @@ router.get("/", moodsController.getAll);
 
 router.post(
   "/",
-  body("value").isString(),
-  body("context")
+  body("value").isString().isLength({ min: 1, max: 255 }),
+  body("note")
     .isString()
     .isLength({ max: 255 })
     .withMessage({
-      msg: "Context must be less than 255 characters",
+      msg: "note must be less than 255 characters",
     })
     .optional(),
+  body("contextIds").isArray().optional(),
   moodsController.create
 );
 
 router.put(
   "/:id",
-  body("context")
+  body("note")
     .isString()
     .isLength({ max: 255 })
     .withMessage({
-      msg: "Context must be less than 255 characters",
+      msg: "note must be less than 255 characters",
     })
     .optional(),
   moodsController.update
