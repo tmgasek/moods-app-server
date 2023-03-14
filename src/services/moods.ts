@@ -41,25 +41,98 @@ interface RemoveArgs {
 const getAll = async ({ userId }: GetAllArgs) => {
   // TODO pagination
 
-  const moods = await db.query(
-    `
-    SELECT * FROM moods WHERE user_id = ?
-    `,
-    [userId]
-  );
+  const sql = `
+SELECT m.id AS mood_id, m.value AS mood_value, m.note AS mood_note, m.created_at AS mood_created_at, m.updated_at AS mood_updated_at,
+         c.id AS context_id, c.value AS context_value
+  FROM moods AS m
+  LEFT JOIN mood_context AS mc ON m.id = mc.mood_id
+  LEFT JOIN contexts AS c ON mc.context_id = c.id
+  WHERE m.user_id = ?
+`;
 
+  const results = (await db.query(sql, [userId])) as any;
+  console.log(results);
+
+  const moods = Object.values(
+    results.reduce((acc: any, row: any) => {
+      const {
+        mood_id,
+        mood_value,
+        mood_note,
+        mood_created_at,
+        mood_updated_at,
+        context_id,
+        context_value,
+      } = row;
+
+      if (!acc[mood_id]) {
+        acc[mood_id] = {
+          id: mood_id,
+          value: mood_value,
+          note: mood_note,
+          created_at: mood_created_at,
+          updated_at: mood_updated_at,
+          contexts: [],
+        };
+      }
+      if (context_id) {
+        acc[mood_id].contexts.push({
+          id: context_id,
+          value: context_value,
+        });
+      }
+
+      return acc;
+    }, {})
+  );
+  console.dir(moods, { depth: null });
   return moods;
 };
 
 const getOne = async ({ id, userId }: GetOneArgs) => {
-  const mood = await db.query(
-    `
-    SELECT * FROM moods WHERE id = ? AND user_id = ?
-    `,
-    [id, userId]
-  );
+  const sql = `
+SELECT m.id AS mood_id, m.value AS mood_value, m.note AS mood_note, m.created_at AS mood_created_at, m.updated_at AS mood_updated_at,
+         c.id AS context_id, c.value AS context_value
+  FROM moods AS m
+  LEFT JOIN mood_context AS mc ON m.id = mc.mood_id
+  LEFT JOIN contexts AS c ON mc.context_id = c.id
+  WHERE m.id = ? AND m.user_id = ?
 
-  return mood;
+`;
+  const mood = await db.query(sql, [id, userId]);
+
+  // create mood object with nested array of context objects
+  const moodObj = mood.reduce((acc: any, row: any) => {
+    const {
+      mood_id,
+      mood_value,
+      mood_note,
+      mood_created_at,
+      mood_updated_at,
+      context_id,
+      context_value,
+    } = row;
+
+    acc.id = mood_id;
+    acc.value = mood_value;
+    acc.note = mood_note;
+    acc.created_at = mood_created_at;
+    acc.updated_at = mood_updated_at;
+    acc.contexts = [];
+
+    if (context_id) {
+      acc.contexts.push({
+        id: context_id,
+        value: context_value,
+      });
+    }
+
+    return acc;
+  }, {});
+
+  console.log("moodObj", moodObj);
+  // TODO: remove brackets
+  return [moodObj];
 };
 
 const create = async ({ userId, value, note, contextIds }: CreateArgs) => {
@@ -93,7 +166,6 @@ const create = async ({ userId, value, note, contextIds }: CreateArgs) => {
       note,
       userId,
     ]);
-    console.log("result", result);
     const moodId = result.insertId;
 
     // insert mood_context rows
